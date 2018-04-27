@@ -83,6 +83,15 @@ public:
         return *this;
     }
 
+    virtual const char* name() const {
+        return name(which_);
+    }
+    virtual time_when_which has_which(time_when_which which) const {
+        if (which == (which & which_)) {
+            return which;
+        }
+        return time_when_none;
+    }
     virtual time_when_which which() const {
         return which_;
     }
@@ -118,6 +127,12 @@ public:
         case time_when_created: return XOS_FS_TIME_WHICH_NAME_CREATED;
         }
         return XOS_FS_TIME_WHICH_NAME_NONE;
+    }
+    static time_when_which next(time_when_which to) {
+        return to << 1;
+    }
+    static time_when_which prev(time_when_which to) {
+        return to >> 1;
     }
 
 protected:
@@ -168,6 +183,9 @@ public:
     }
     virtual time_when when() const {
         return when_;
+    }
+    virtual const char* when_name() const {
+        return when_.name();
     }
 
     virtual time_when_which set_which(time_when_which to) {

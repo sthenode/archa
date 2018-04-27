@@ -95,6 +95,12 @@ public:
         return *this;
     }
 
+    virtual const char* name() const {
+        return name(which_);
+    }
+    virtual operator const char* () const {
+        return name(which_);
+    }
     virtual entry_type_which which() const {
         return which_;
     }
@@ -124,21 +130,37 @@ protected:
 };
 typedef entry_typet<> entry_type;
 
-typedef implement_base entry_implements;
+///////////////////////////////////////////////////////////////////////
+///  Class: entry_implementt
+///////////////////////////////////////////////////////////////////////
+template
+<class TString = char_string, class TImplements = implement_base>
+
+class _EXPORT_CLASS entry_implementt: virtual public TImplements {
+public:
+    typedef TImplements implements;
+
+    typedef TString string_t;
+    typedef typename string_t::char_t char_t;
+    typedef typename string_t::end_t end_t;
+    enum { endof = string_t::endof };
+};
+typedef entry_implementt<> entry_implement;
+
+typedef entry_implement entry_implements;
 typedef base entry_extends;
 ///////////////////////////////////////////////////////////////////////
 ///  Class: entryt
 ///////////////////////////////////////////////////////////////////////
 template
-<class TString = char_string,
- class TExtends = entry_extends, class TImplements = entry_implements>
+<class TImplements = entry_implements, class TExtends = entry_extends>
 
 class _EXPORT_CLASS entryt: virtual public TImplements, public TExtends {
 public:
     typedef TImplements implements;
     typedef TExtends extends;
 
-    typedef TString string_t;
+    typedef typename TImplements::string_t string_t;
     typedef typename string_t::char_t char_t;
     typedef typename string_t::end_t end_t;
     enum { endof = string_t::endof };
@@ -157,7 +179,15 @@ public:
     virtual ~entryt() {
     }
 
-    virtual entry_type exists(const char_t* path) {
+    virtual entry_type exists(const char* chars) {
+        const string_t path(chars);
+        return exists(path);
+    }
+    virtual entry_type exists(const wchar_t* chars) {
+        const string_t path(chars);
+        return exists(path);
+    }
+    virtual entry_type exists(const string_t& path) {
         return entry_type_none;
     }
 
@@ -293,6 +323,16 @@ public:
         return time_created_;
     }
 
+    virtual const time* has_time_when(const fs::time_when& when) const {
+        const time_when_which which = when.which();
+        return has_time_when(which);
+    }
+    virtual const time* has_time_when(time_when_which which) const {
+        if (which == (times_.has_which(which))) {
+            return time_when(which);
+        }
+        return 0;
+    }
     virtual const time* time_when(const fs::time_when& when) const {
         const time_when_which which = when.which();
         return time_when(which);

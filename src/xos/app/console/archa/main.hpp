@@ -22,7 +22,9 @@
 #define _XOS_APP_CONSOLE_ARCHA_MAIN_HPP
 
 #include "xos/console/getopt/main.hpp"
+#include "xos/os/fs/entry.hpp"
 #include "xos/fs/path.hpp"
+#include "xos/base/to_string.hpp"
 
 namespace xos {
 namespace app {
@@ -54,9 +56,31 @@ protected:
     virtual int run(int argc, char_t** argv, char_t** env) {
         int err = 0;
         fs::path path(argv[0]);
+        os::os::fs::entry entry;
+        fs::entry_type type;
+
         this->outlln("directory = \"", path.directory().chars(), "\"", NULL);
         this->outlln("name = \"", path.file_name().chars(), "\"", NULL);
         this->outlln("extension = \"", path.file_extension().chars(), "\"", NULL);
+
+        if ((type = entry.exists(path))) {
+            const fs::time* time  = 0;
+            
+            this->outlln("found", " type = ", type.name(), NULL);
+            for (fs::time_when_which when = fs::first_time_when; 
+                 when < fs::next_time_when; when = fs::time_when::next(when)) {
+                
+                if ((time = entry.has_time_when(when))) {
+                    unsigned_to_string year(time->year()), 
+                                       month(time->month()), 
+                                       day(time->day());
+                    
+                    this->outlln
+                    ("     ", " time ", time->when_name(), " = ", 
+                     month.chars(), "/", day.chars(), "/", year.chars(), NULL);
+                }
+            }
+        }
         return err;
     }
 };
