@@ -60,6 +60,12 @@ $${ARCHA_SRC}/xos/fs/time.hpp \
 $${ARCHA_SRC}/xos/fs/path_separator.hpp \
 $${ARCHA_SRC}/xos/fs/path.hpp \
 $${ARCHA_SRC}/xos/fs/entry.hpp \
+$${ARCHA_SRC}/xos/fs/directory/entry.hpp \
+$${ARCHA_SRC}/xos/fs/directory/path.hpp \
+$${ARCHA_SRC}/xos/os/os/os.hpp \
+$${ARCHA_SRC}/xos/os/os/fs.hpp \
+$${ARCHA_SRC}/xos/os/posix/fs/entry.hpp \
+$${ARCHA_SRC}/xos/os/fs/entry.hpp \
 $${ARCHA_SRC}/xos/app/console/archa/main.hpp \
 $${FILA_SRC}/xos/console/main_main.hpp \
 
@@ -70,8 +76,10 @@ $${CRONO_SRC}/xos/base/timezone.cpp \
 $${CRONO_SRC}/xos/base/date.cpp \
 $${ARCHA_SRC}/xos/fs/time.cpp \
 $${ARCHA_SRC}/xos/fs/path_separator.cpp \
-$${ARCHA_SRC}/xos/fs/path.cpp \
-$${ARCHA_SRC}/xos/fs/entry.cpp \
+$${ARCHA_SRC}/xos/fs/directory/path.cpp \
+$${ARCHA_SRC}/xos/os/os/os.cpp \
+$${ARCHA_SRC}/xos/os/os/fs.cpp \
+$${ARCHA_SRC}/xos/os/posix/fs/entry.cpp \
 $${ARCHA_SRC}/xos/app/console/archa/main.cpp \
 $${FILA_SRC}/xos/console/main_main.cpp \
 
@@ -85,3 +93,4 @@ $${archa_FRAMEWORKS} \
 #
 archa_exe_LIBS += \
 $${archa_LIBS} \
+
