@@ -120,6 +120,28 @@ fila_LIBS += \
 -l$${FILA_NAME} \
 
 ########################################################################
+# arbora
+ARBORA_THIRDPARTY_PKG_MAKE_BLD = $${ARBORA_THIRDPARTY_PKG}/build/$${ARCHA_OS}/$${BUILD_CONFIG}
+ARBORA_THIRDPARTY_PRJ_MAKE_BLD = $${ARBORA_THIRDPARTY_PRJ}/build/$${ARCHA_OS}/$${BUILD_CONFIG}
+ARBORA_THIRDPARTY_PKG_BLD = $${ARBORA_THIRDPARTY_PKG}/build/$${ARCHA_OS}/QtCreator/$${BUILD_CONFIG}
+ARBORA_THIRDPARTY_PRJ_BLD = $${ARBORA_THIRDPARTY_PRJ}/build/$${ARCHA_OS}/QtCreator/$${BUILD_CONFIG}
+ARBORA_PKG_BLD = $${OTHER_BLD}/$${ARBORA_PKG}/build/$${ARCHA_OS}/QtCreator/$${BUILD_CONFIG}
+ARBORA_PRJ_BLD = $${OTHER_BLD}/$${ARBORA_PRJ}/build/$${ARCHA_OS}/QtCreator/$${BUILD_CONFIG}
+#ARBORA_LIB = $${ARBORA_THIRDPARTY_PKG_MAKE_BLD}/lib
+#ARBORA_LIB = $${ARBORA_THIRDPARTY_PRJ_MAKE_BLD}/lib
+#ARBORA_LIB = $${ARBORA_THIRDPARTY_PKG_BLD}/lib
+#ARBORA_LIB = $${ARBORA_THIRDPARTY_PRJ_BLD}/lib
+#ARBORA_LIB = $${ARBORA_PKG_BLD}/lib
+ARBORA_LIB = $${ARBORA_PRJ_BLD}/lib
+#ARBORA_LIB = $${ARCHA_LIB}
+
+# arbora LIBS
+#
+arbora_LIBS += \
+-L$${ARBORA_LIB}/lib$${ARBORA_NAME} \
+-l$${ARBORA_NAME} \
+
+########################################################################
 # archa
 
 # archa INCLUDEPATH
@@ -133,6 +155,7 @@ archa_DEFINES += \
 # archa LIBS
 #
 archa_LIBS += \
+$${arbora_LIBS} \
 $${fila_LIBS} \
 $${crono_LIBS} \
 $${nadir_LIBS} \

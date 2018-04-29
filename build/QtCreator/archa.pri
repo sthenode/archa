@@ -94,6 +94,24 @@ build_fila_DEFINES += \
 build_fila_LIBS += \
 
 ########################################################################
+# arbora
+#
+# pkg-config --cflags --libs arbora
+#
+
+# build arbora INCLUDEPATH
+#
+build_arbora_INCLUDEPATH += \
+
+# build arbora DEFINES
+#
+build_arbora_DEFINES += \
+
+# build arbora LIBS
+#
+build_arbora_LIBS += \
+
+########################################################################
 # archa
 
 # build archa INCLUDEPATH
@@ -108,15 +126,18 @@ $${build_rostra_INCLUDEPATH} \
 # build archa DEFINES
 #
 build_archa_DEFINES += \
+$${build_arbora_INCLUDEPATH} \
 $${build_rostra_DEFINES} \
 $${build_nadir_DEFINES} \
 $${build_crono_DEFINES} \
 $${build_fila_DEFINES} \
+$${build_arbora_DEFINES} \
 
 
 # build archa LIBS
 #
 build_archa_LIBS += \
+$${build_arbora_LIBS} \
 $${build_fila_LIBS} \
 $${build_crono_LIBS} \
 $${build_nadir_LIBS} \
