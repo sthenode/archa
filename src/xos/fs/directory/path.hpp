@@ -57,6 +57,16 @@ public:
     virtual bool close() {
         return false;
     }
+
+    virtual const char* directory_separator_chars() const {
+        return "/";
+    }
+    virtual const char* volume_directory_separator_chars() const {
+        return "\\";
+    }
+    virtual const char* volume_separator_chars() const {
+        return ":";
+    }
 };
 typedef patht<> path;
 

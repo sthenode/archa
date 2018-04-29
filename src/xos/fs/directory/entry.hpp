@@ -43,10 +43,19 @@ public:
     typedef typename string_t::end_t end_t;
     enum { endof = string_t::endof };
 
-    entryt(const entryt &copy)
-    : extends(copy), is_current_(copy.is_current()), is_parent_(copy.is_parent()) {
+    entryt(const entryt &copy) {
+        construct(copy);
     }
-    entryt(): is_current_(false), is_parent_(false) {
+    entryt() {
+        construct();
+    }
+    void construct(const entryt &copy) {
+        extends::construct(copy), 
+        is_current_=(copy.is_current()), is_parent_=(copy.is_parent());
+        path_name_.assign(copy.path_name());
+    }
+    void construct() {
+        is_current_=(false), is_parent_=(false);
     }
     virtual ~entryt() {
     }
@@ -73,11 +82,32 @@ public:
         return is_parent_;
     }
 
+    virtual const string_t& set_path_name(const char* to) {
+        path_name_.assign(to);
+        return path_name_;
+    }
+    virtual const string_t& set_path_name(const wchar_t* to) {
+        path_name_.assign(to);
+        return path_name_;
+    }
+    virtual const string_t& path_name() const {
+        return path_name_;
+    }
+    
     virtual const char* current_name_chars() const {
         return ".";
     }
     virtual const char* parent_name_chars() const {
         return "..";
+    }
+    virtual const char* volume_separator_chars() const {
+        return ":";
+    }
+    virtual const char* volume_directory_separator_chars() const {
+        return "\\";
+    }
+    virtual const char* directory_separator_chars() const {
+        return "/";
     }
 
 protected:
@@ -96,6 +126,7 @@ protected:
 
 protected:
     bool is_current_, is_parent_;
+    string_t path_name_;
 };
 typedef entryt<> entry;
 

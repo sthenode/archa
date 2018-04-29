@@ -165,16 +165,22 @@ public:
     typedef typename string_t::end_t end_t;
     enum { endof = string_t::endof };
 
-    entryt()
-    : is_hidden_(false), size_(0), type_(entry_type_none), times_(time_when_none),
-      time_modified_(time_when_modified), time_accessed_(time_when_accessed),
-      time_changed_(time_when_changed), time_created_(time_when_created) {
+    entryt(const entryt& copy) {
+        construct(copy);
     }
-    entryt(const entryt& copy)
-    : name_(copy.name()), is_hidden_(copy.is_hidden()),
-      size_(copy.size()), type_(copy.type()), times_(copy.times()),
-      time_modified_(copy.time_modified()), time_accessed_(copy.time_accessed()),
-      time_changed_(copy.time_changed()), time_created_(copy.time_created()) {
+    entryt() {
+        construct();
+    }
+    void construct(const entryt& copy) {
+        name_=(copy.name()), is_hidden_=(copy.is_hidden()),
+        size_=(copy.size()), type_=(copy.type()), times_=(copy.times()),
+        time_modified_=(copy.time_modified()), time_accessed_=(copy.time_accessed()),
+        time_changed_=(copy.time_changed()), time_created_=(copy.time_created());
+    }
+    void construct() {
+        is_hidden_=(false), size_=(0), type_=(entry_type_none), times_=(time_when_none),
+        time_modified_=(time_when_modified), time_accessed_=(time_when_accessed),
+        time_changed_=(time_when_changed), time_created_=(time_when_created);
     }
     virtual ~entryt() {
     }

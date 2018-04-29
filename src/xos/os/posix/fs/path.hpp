@@ -21,43 +21,14 @@
 #ifndef _XOS_OS_POSIX_FS_PATH_HPP
 #define _XOS_OS_POSIX_FS_PATH_HPP
 
-#include "xos/fs/directory/entry.hpp"
+#include "xos/fs/path.hpp"
 
 namespace xos {
 namespace os {
 namespace posix {
 namespace fs {
 
-typedef implement_base path_implementt_implements;
-///////////////////////////////////////////////////////////////////////
-///  Class: path_implementt
-///////////////////////////////////////////////////////////////////////
-template <class TImplements = path_implementt_implements>
-class _EXPORT_CLASS path_implementt: virtual public TImplements {
-public:
-    typedef TImplements implements;
-};
-typedef path_implementt<> path_implement;
-
-typedef path_implement patht_implements;
-typedef base patht_extends;
-///////////////////////////////////////////////////////////////////////
-///  Class: patht
-///////////////////////////////////////////////////////////////////////
-template <class TImplements = patht_implements, class TExtends = patht_extends>
-class _EXPORT_CLASS patht: virtual public TImplements, public TExtends {
-public:
-    typedef TImplements implements;
-    typedef TExtends extends;
-
-    patht(const patht &copy) {
-    }
-    patht() {
-    }
-    virtual ~patht() {
-    }
-};
-typedef patht<> path;
+typedef xos::fs::path path;
 
 } /// namespace fs
 } /// namespace posix

@@ -13,20 +13,30 @@
 /// or otherwise) arising in any way out of the use of this software, 
 /// even if advised of the possibility of such damage.
 ///
-///   File: path.cpp
+///   File: entry.hpp
 ///
 /// Author: $author$
-///   Date: 4/27/2018
+///   Date: 4/28/2018
 ///////////////////////////////////////////////////////////////////////
-#include "xos/os/fs/directory/path.hpp"
+#ifndef _XOS_OS_APPLE_OSX_FS_DIRECTORY_ENTRY_HPP
+#define _XOS_OS_APPLE_OSX_FS_DIRECTORY_ENTRY_HPP
+
+#include "xos/os/posix/fs/directory/entry.hpp"
 
 namespace xos {
 namespace os {
+namespace apple {
+namespace osx {
 namespace fs {
 namespace directory {
 
+typedef posix::fs::directory::entry entry;
+
 } /// namespace directory
 } /// namespace fs
+} /// namespace osx
+} /// namespace apple
 } /// namespace os
 } /// namespace xos
 
+#endif /// _XOS_OS_APPLE_OSX_FS_DIRECTORY_ENTRY_HPP 

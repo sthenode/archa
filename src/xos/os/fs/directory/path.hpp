@@ -21,43 +21,22 @@
 #ifndef _XOS_OS_FS_DIRECORY_PATH_HPP
 #define _XOS_OS_FS_DIRECORY_PATH_HPP
 
-#include "xos/fs/directory/entry.hpp"
+#include "xos/os/os/fs.hpp"
+
+#if defined(WINDOWS)
+#include "xos/os/microsoft/windows/fs/directory/path.hpp"
+#elif defined(MACOSX)
+#include "xos/os/apple/osx/fs/directory/path.hpp"
+#elif defined(LINUX)
+#include "xos/os/linux/fs/directory/path.hpp"
+#else // defined(WINDOWS)
+#include "xos/os/posix/fs/directory/path.hpp"
+#endif // defined(WINDOWS)
 
 namespace xos {
 namespace os {
 namespace fs {
 namespace directory {
-
-typedef implement_base path_implementt_implements;
-///////////////////////////////////////////////////////////////////////
-///  Class: path_implementt
-///////////////////////////////////////////////////////////////////////
-template <class TImplements = path_implementt_implements>
-class _EXPORT_CLASS path_implementt: virtual public TImplements {
-public:
-    typedef TImplements implements;
-};
-typedef path_implementt<> path_implement;
-
-typedef path_implement patht_implements;
-typedef base patht_extends;
-///////////////////////////////////////////////////////////////////////
-///  Class: patht
-///////////////////////////////////////////////////////////////////////
-template <class TImplements = patht_implements, class TExtends = patht_extends>
-class _EXPORT_CLASS patht: virtual public TImplements, public TExtends {
-public:
-    typedef TImplements implements;
-    typedef TExtends extends;
-
-    patht(const patht &copy) {
-    }
-    patht() {
-    }
-    virtual ~patht() {
-    }
-};
-typedef patht<> path;
 
 } /// namespace directory
 } /// namespace fs

@@ -21,43 +21,22 @@
 #ifndef _XOS_OS_FS_DIRECORY_ENTRY_HPP
 #define _XOS_OS_FS_DIRECORY_ENTRY_HPP
 
-#include "xos/fs/directory/entry.hpp"
+#include "xos/os/os/fs.hpp"
+
+#if defined(WINDOWS)
+#include "xos/os/microsoft/windows/fs/directory/entry.hpp"
+#elif defined(MACOSX)
+#include "xos/os/apple/osx/fs/directory/entry.hpp"
+#elif defined(LINUX)
+#include "xos/os/linux/fs/directory/entry.hpp"
+#else // defined(WINDOWS)
+#include "xos/os/posix/fs/directory/entry.hpp"
+#endif // defined(WINDOWS)
 
 namespace xos {
 namespace os {
 namespace fs {
 namespace directory {
-
-typedef implement_base entry_implementt_implements;
-///////////////////////////////////////////////////////////////////////
-///  Class: entry_implementt
-///////////////////////////////////////////////////////////////////////
-template <class TImplements = entry_implementt_implements>
-class _EXPORT_CLASS entry_implementt: virtual public TImplements {
-public:
-    typedef TImplements implements;
-};
-typedef entry_implementt<> entry_implement;
-
-typedef entry_implement entryt_implements;
-typedef base entryt_extends;
-///////////////////////////////////////////////////////////////////////
-///  Class: entryt
-///////////////////////////////////////////////////////////////////////
-template <class TImplements = entryt_implements, class TExtends = entryt_extends>
-class _EXPORT_CLASS entryt: virtual public TImplements, public TExtends {
-public:
-    typedef TImplements implements;
-    typedef TExtends extends;
-
-    entryt(const entryt &copy) {
-    }
-    entryt() {
-    }
-    virtual ~entryt() {
-    }
-};
-typedef entryt<> entry;
 
 } /// namespace directory
 } /// namespace fs

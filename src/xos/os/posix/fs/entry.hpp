@@ -60,13 +60,11 @@ enum {
 typedef xos::fs::entry_size_t entry_size_t;
 typedef xos::fs::entry_ssize_t entry_ssize_t;
 
-typedef implement_base statt_implements;
-typedef base statt_extends;
 ///////////////////////////////////////////////////////////////////////
 ///  Class: statt
 ///////////////////////////////////////////////////////////////////////
 template 
-<class TImplements = statt_implements, class TExtends = statt_extends>
+<class TImplements = implement_base, class TExtends = base>
 
 class _EXPORT_CLASS statt: virtual public TImplements, public TExtends {
 public:
@@ -99,13 +97,11 @@ protected:
 };
 typedef statt<> stat_t;
 
-typedef implement_base utimbuft_implements;
-typedef base utimbuft_extends;
 ///////////////////////////////////////////////////////////////////////
 ///  Class: utimbuft
 ///////////////////////////////////////////////////////////////////////
 template 
-<class TImplements = utimbuft_implements, class TExtends = utimbuft_extends>
+<class TImplements = implement_base, class TExtends = base>
 
 class _EXPORT_CLASS utimbuft: virtual public TImplements, public TExtends {
 public:
@@ -138,13 +134,12 @@ protected:
 };
 typedef utimbuft<> utimbuf_t;
 
-typedef xos::fs::entry::implements entryt_implements;
-typedef xos::fs::entry entryt_extends;
 ///////////////////////////////////////////////////////////////////////
 ///  Class: entryt
 ///////////////////////////////////////////////////////////////////////
 template 
-<class TImplements = entryt_implements, class TExtends = entryt_extends>
+<class TImplements = xos::fs::entry::implements, 
+ class TExtends = xos::fs::entry>
 
 class _EXPORT_CLASS entryt: virtual public TImplements, public TExtends {
 public:
