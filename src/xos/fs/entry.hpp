@@ -22,7 +22,7 @@
 #define _XOS_FS_ENTRY_HPP
 
 #include "xos/fs/time.hpp"
-#include "xos/base/string.hpp"
+#include "xos/fs/path.hpp"
 
 #define XOS_FS_ENTRY_TYPE_WHICH_NAME_NONE "none"
 #define XOS_FS_ENTRY_TYPE_WHICH_NAME_FILE "file"
@@ -229,8 +229,40 @@ public:
         time_accessed_.clear();
         time_changed_.clear();
         time_created_.clear();
+        path_.clear();
         name_.clear();
     }
+
+    virtual const char_t* set_path(const char_t* chars, size_t length) {
+        path_.assign(chars, length);
+        on_set_path();
+        return path_.c_str();
+    }
+    virtual const char_t* set_path(const char_t* chars) {
+        path_.assign(chars);
+        on_set_path();
+        return path_.c_str();
+    }
+    virtual const char_t* has_path(size_t& length) const {
+        if ((length = path_.length())) {
+            return path_.c_str();
+        }
+        return 0;
+    }
+    virtual const char_t* has_path() const {
+        if ((path_.length())) {
+            return path_.c_str();
+        }
+        return 0;
+    }
+    virtual const char_t* path(size_t& length) const {
+        length = path_.length();
+        return path_.c_str();
+    }
+    virtual const char_t* path() const {
+        return path_.c_str();
+    }
+
     virtual const char_t* set_name(const char_t* chars, size_t length) {
         name_.assign(chars, length);
         on_set_name();
@@ -364,6 +396,8 @@ public:
 protected:
     virtual void on_set_is_hidden() {
     }
+    virtual void on_set_path() {
+    }
     virtual void on_set_name() {
     }
     virtual void on_set_size() {
@@ -372,7 +406,7 @@ protected:
     }
 
 protected:
-    string_t name_;
+    string_t path_, name_;
     bool is_hidden_;
     entry_size_t size_;
     entry_type type_;

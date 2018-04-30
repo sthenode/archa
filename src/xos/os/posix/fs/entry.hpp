@@ -163,13 +163,20 @@ public:
         if ((chars = path.has_chars())) {
             return exists(chars);
         }
+        this->clear();        
         return entry_type_none;
     }
     virtual entry_type exists(const char* chars) {
+        this->clear();
         if ((chars)) {
             if ((is_found(chars))) {
                 entry_type type = entry_type_none;
                 if (entry_type_none != (type = get_found_attributes())) {
+                    xos::fs::path path(chars);
+                    size_t length = 0;
+                    if ((chars = path.file_path().has_chars(length))) {
+                        this->set_path(chars, length);
+                    }
                     return type;
                 }
             }

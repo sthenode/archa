@@ -21,103 +21,19 @@
 #ifndef _XOS_APP_CONSOLE_ARCHA_MAIN_HPP
 #define _XOS_APP_CONSOLE_ARCHA_MAIN_HPP
 
-#include "xos/console/getopt/main.hpp"
-#include "xos/fs/entry.hpp"
+#include "xos/app/console/archa/main_opt.hpp"
+#include "xos/app/console/archa/branch.hpp"
 #include "xos/fs/path.hpp"
-#include "xos/fs/directory/entry.hpp"
-#include "xos/fs/directory/path.hpp"
 #include "xos/os/fs/entry.hpp"
-#include "xos/os/fs/path.hpp"
-#include "xos/os/fs/directory/entry.hpp"
-#include "xos/os/fs/directory/path.hpp"
 #include "xos/base/to_string.hpp"
-#include "xos/base/std/tree/search.hpp"
 
 namespace xos {
 namespace app {
 namespace console {
 namespace archa {
 
-class branch;
-typedef std::tree::branchest<branch> branches;
-typedef std::tree::brancht<branch, branches, fs::directory::entry> branch_extends;
-///////////////////////////////////////////////////////////////////////
-///  Class: branch
-///////////////////////////////////////////////////////////////////////
-class branch: public branch_extends {
-public:
-    typedef branch_extends extends;
-    branch(const char* path, const char* name, fs::entry_type type) {
-        this->set_path_name(path);
-        this->set_name(name);
-        this->set_type(type);
-    }
-    branch(const char* path, const fs::directory::entry& entry) {
-        construct(path, entry);
-    }
-    branch(const fs::directory::entry& entry) {
-        construct(entry);
-    }
-    branch(const branch& copy) {
-        construct(copy);
-    }
-    branch() {
-    }
-    void construct(const char* path, const fs::directory::entry& entry) {
-        construct(entry);
-        this->set_path_name(path);
-    }
-    void construct(const fs::directory::entry& entry) {
-        extends::construct(entry);
-        got_branches_=(false);
-    }
-    virtual ~branch() {
-    }
-    virtual archa::branches& branches() const {
-        archa::branches& branches = extends::branches();
-        bool& got_branches = this->got_branches();
-
-        if (!(got_branches)) {
-            const char_t* chars = 0;
-
-            got_branches=(true);
-            if ((fs::entry_type_directory == (this->type())) 
-                && (!this->is_circular()) && (chars = this->path_name().has_chars())) {
-                string_t name(chars);
-
-                name.append(this->directory_separator_chars());
-                if ((chars = this->name())) {
-                    os::os::fs::directory::path path;
-
-                    name.append(chars);
-                    if ((path.open(name))) {
-                        os::os::fs::directory::entry* entry = 0;
-
-                        if ((entry = path.get_first_entry())) {
-                            do {
-                                if (!(entry->is_circular())) {
-                                    branches.push_back(new branch(name.chars(),*entry));
-                                }
-                                entry = path.get_next_entry();
-                            } while ((entry));
-                        }
-                        path.close();
-                    } else {
-                    }
-                }
-            }
-        }
-        return branches;
-    }
-    virtual bool& got_branches() const {
-        return (bool&)got_branches_;
-    }
-protected:
-    bool got_branches_;
-};
-
-typedef xos::console::getopt::main::implements maint_implements;
-typedef xos::console::getopt::main maint_extends;
+typedef main_opt::implements maint_implements;
+typedef main_opt maint_extends;
 ///////////////////////////////////////////////////////////////////////
 ///  Class: maint
 ///////////////////////////////////////////////////////////////////////
@@ -128,6 +44,7 @@ class _EXPORT_CLASS maint: virtual public TImplements, public TExtends {
 public:
     typedef TImplements implements;
     typedef TExtends extends;
+    typedef maint derives;
 
     typedef typename implements::string_t string_t;
     typedef typename implements::char_t char_t;
@@ -165,77 +82,66 @@ public:
     }
 
 protected:
-    typedef std::tree::findt<branch, std::tree::depth_first_searcht<branch, branches>, maint> depth_first_search;
-    
     virtual int run(int argc, char_t** argv, char_t** env) {
         int err = 0;
         const char* chars = (optind < argc)?(argv[optind]):(argv[0]);
-        fs::path path(chars);
-        this->outlln("path = \"", path.directory().chars(), "\"", NULL);
-        this->outlln("name = \"", path.file_name().chars(), "\"", NULL);
-        if ((chars = path.has_chars())) {
-            branch dir(path.directory().chars(), path.file_name().chars(), fs::entry_type_directory);
-            depth_first_search search(*this, dir);
+        fs::path p(chars);
+        err = path(p);
+        return err;
+    }
+    int (derives::*path_)(fs::path& path);
+    int path(fs::path& path) {
+        int err = 0;
+        if ((path_)) {
+            err = (this->*path_)(path);
+        } else {
+            err = path_search(path);
         }
         return err;
     }
-    virtual int run_list(int argc, char_t** argv, char_t** env) {
+    int path_search(fs::path& path) {
         int err = 0;
-        const char* chars = (optind < argc)?(argv[optind]):(argv[0]);
-        os::os::fs::directory::path path;
-        
-        if ((path.open(chars))) {
-            err = on_open(path);
-            path.close();
+        if ((path.has_chars())) {
+            branch b(path.directory(), path.file_name(), fs::entry_type_directory);
+            search(b);
         }
         return err;
     }
-    virtual int on_open(os::os::fs::directory::path& path) {
+    int (derives::*search_)(branch& b);
+    virtual int search(branch& b) {
         int err = 0;
-        os::os::fs::directory::entry* entry = 0;
-        if ((entry = path.get_first_entry())) {
-            string_t name;
-            do {
-                if (!(entry->is_circular())) {
-                    name.assignl(path.name(), path.directory_separator_chars(), entry->name(), NULL);
-                    this->outlln("name = \"", name.chars(), "\"", NULL);
-                }
-            } while ((entry = path.get_next_entry()));
+        if ((search_)) {
+            err = (this->*search_)(b);
+        } else {
+            err = depth_first_search(b);
         }
         return err;
     }
-    virtual int run_stat(int argc, char_t** argv, char_t** env) {
+    virtual int breadth_first_search(branch& b) {
         int err = 0;
-        const char* chars = (optind < argc)?(argv[optind]):(argv[0]);
-        fs::path path(chars);
+        std::tree::findt<branch, std::tree::breadth_first_searcht<branch, branches>, maint> search(*this, b);
+        return err;
+    }
+    virtual int depth_first_search(branch& b) {
+        int err = 0;
+        std::tree::findt<branch, std::tree::depth_first_searcht<branch, branches>, maint> search(*this, b);
+        return err;
+    }
+    virtual int depend_first_search(branch& b) {
+        int err = 0;
+        std::tree::findt<branch, std::tree::depend_first_searcht<branch, branches>, maint> search(*this, b);
+        return err;
+    }
+    virtual int path_stat(fs::path& path) {
+        int err = 0;
         os::os::fs::entry entry;
         fs::entry_type type;
-
-        if ((chars = path.has_chars())) {
-            this->outlln("path = \"", chars, "\"", NULL);
-        }
-        if ((chars = path.host().has_chars())) {
-            this->outlln("host = \"", chars, "\"", NULL);
-        }
-        if ((chars = path.volume().has_chars())) {
-            this->outlln("volume = \"", chars, "\"", NULL);
-        }
-        if ((chars = path.directory().has_chars())) {
-            this->outlln("directory = \"", chars, "\"", NULL);
-        }
-        if ((chars = path.file_name().has_chars())) {
-            this->outlln("name = \"", chars, "\"", NULL);
-        }
-        if ((chars = path.file_base().has_chars())) {
-            this->outlln("base = \"", chars, "\"", NULL);
-        }
-        if ((chars = path.file_extension().has_chars())) {
-            this->outlln("extension = \"", chars, "\"", NULL);
-        }
 
         if ((type = entry.exists(path))) {
             const fs::time* time  = 0;
             
+            this->outlln("path = \"", entry.path(), "\"", NULL);
+            this->outlln("name = \"", entry.name(), "\"", NULL);
             this->outlln("type = ", type.name(), NULL);
             for (fs::time_when_which when = fs::first_time_when; 
                  when < fs::next_time_when; when = fs::time_when::next(when)) {
@@ -248,6 +154,42 @@ protected:
                     this->outlln
                     ("time ", time->when_name(), " = ", 
                      month.chars(), "/", day.chars(), "/", year.chars(), NULL);
+                }
+            }
+        }
+        return err;
+    }
+
+    virtual int on_stat_option
+    (int optval, const char_t* optarg,
+     const char_t* optname, int optind,
+     int argc, char_t**argv, char_t**env) {
+        int err = 0;
+        path_ = &derives::path_stat;
+        return err;
+    }
+    virtual int on_search_option
+    (int optval, const char_t* optarg,
+     const char_t* optname, int optind,
+     int argc, char_t**argv, char_t**env) {
+        int err = 0;
+        path_ = &derives::path_search;
+        if ((optarg) && (optarg[0])) {
+            if (((!optarg[1]) && (optarg[0]==(XOS_CONSOLE_ARCHA_MAIN_SEARCH_OPTARG_BREADTH[1])))
+                || (!chars_t::compare(optarg, XOS_CONSOLE_ARCHA_MAIN_SEARCH_OPTARG_BREADTH))) {
+                search_ = &derives::breadth_first_search;
+            } else {
+                if (((!optarg[1]) && (optarg[0]==(XOS_CONSOLE_ARCHA_MAIN_SEARCH_OPTARG_DEPTH[1])))
+                    || (!chars_t::compare(optarg, XOS_CONSOLE_ARCHA_MAIN_SEARCH_OPTARG_DEPTH))) {
+                    search_ = &derives::depth_first_search;
+                } else {
+                    if (((!optarg[1]) && (optarg[0]==(XOS_CONSOLE_ARCHA_MAIN_SEARCH_OPTARG_DEPEND[1])))
+                        || (!chars_t::compare(optarg, XOS_CONSOLE_ARCHA_MAIN_SEARCH_OPTARG_DEPEND))) {
+                        search_ = &derives::depend_first_search;
+                    } else {
+                        err = this->on_invalid_option_arg
+                        (optval, optarg, optname, optind, argc, argv, env);
+                    }
                 }
             }
         }
