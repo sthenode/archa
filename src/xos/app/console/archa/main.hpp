@@ -113,7 +113,19 @@ protected:
         if ((search_)) {
             err = (this->*search_)(b);
         } else {
-            err = depth_first_search(b);
+            err = all_search(b);
+        }
+        return err;
+    }
+    virtual int all_search(branch& b) {
+        int err = 0;
+        if (!(err = breadth_first_search(b))) {
+            this ->outln();
+            if (!(err = depth_first_search(b))) {
+                this ->outln();
+                if (!(err = depend_first_search(b))) {
+                }
+            }
         }
         return err;
     }
