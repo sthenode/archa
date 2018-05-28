@@ -53,9 +53,13 @@ $${archa_DEFINES} \
 # archa_exe HEADERS
 #
 archa_exe_HEADERS += \
+$${NADIR_SRC}/xos/console/output_stream.hpp \
 $${CRONO_SRC}/xos/base/timezone.hpp \
 $${CRONO_SRC}/xos/base/time.hpp \
 $${CRONO_SRC}/xos/base/date.hpp \
+$${ARBORA_SRC}/xos/base/std/tree/leaf.hpp \
+$${ARBORA_SRC}/xos/base/std/tree/branch.hpp \
+$${ARBORA_SRC}/xos/base/std/tree/search.hpp \
 $${ARCHA_SRC}/xos/fs/time.hpp \
 $${ARCHA_SRC}/xos/fs/path_separator.hpp \
 $${ARCHA_SRC}/xos/fs/path.hpp \
@@ -80,6 +84,7 @@ $${FILA_SRC}/xos/console/main_main.hpp \
 # archa_exe SOURCES
 #
 archa_exe_SOURCES += \
+$${NADIR_SRC}/xos/console/output_stream.cpp \
 $${CRONO_SRC}/xos/base/timezone.cpp \
 $${CRONO_SRC}/xos/base/date.cpp \
 $${ARCHA_SRC}/xos/fs/time.cpp \
