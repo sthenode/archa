@@ -70,6 +70,11 @@ public:
     virtual ~time_whent() {
     }
 
+    virtual time_whent& clear() {
+        which_ = time_when_none;
+        return *this;
+    }
+
     virtual time_whent& operator = (time_when_which which) {
         which_ = which;
         return *this;
@@ -173,6 +178,12 @@ public:
     virtual ~timet() {
     }
 
+    virtual timet& clear() {
+        extends::clear();
+        when_.clear();
+        return *this;
+    }
+    
     virtual time_when set_when(const time_when& to) {
         when_ = to;
         return when_;

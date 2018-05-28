@@ -49,17 +49,65 @@ public:
     entryt() {
         construct();
     }
-    void construct(const entryt &copy) {
-        extends::construct(copy), 
-        is_current_=(copy.is_current()), is_parent_=(copy.is_parent());
-        path_name_.assign(copy.path_name());
-    }
-    void construct() {
-        is_current_=(false), is_parent_=(false);
-    }
     virtual ~entryt() {
+        destruct();
     }
     
+    virtual const char_t* append_path_name(const char* to, size_t length) {
+        string_t name(to, length);
+        append_path_name(name);
+        return path_name();
+    }
+    virtual const char_t* append_path_name(const char* to) {
+        string_t name(to);
+        append_path_name(name);
+        return path_name();
+    }
+    virtual const char_t* append_path_name(const wchar_t* to, size_t length) {
+        string_t name(to, length);
+        append_path_name(name);
+        return path_name();
+    }
+    virtual const char_t* append_path_name(const wchar_t* to) {
+        string_t name(to);
+        append_path_name(name);
+        return path_name();
+    }
+    virtual const char_t* set_path_name(const char* to, size_t length) {
+        path_name_.assign(to, length);
+        return path_name();
+    }
+    virtual const char_t* set_path_name(const char* to) {
+        path_name_.assign(to);
+        return path_name();
+    }
+    virtual const char_t* set_path_name(const wchar_t* to, size_t length) {
+        path_name_.assign(to, length);
+        return path_name();
+    }
+    virtual const char_t* set_path_name(const wchar_t* to) {
+        path_name_.assign(to);
+        return path_name();
+    }
+    virtual const char_t* has_path_name() const {
+        return path_name_.has_chars();
+    }
+    virtual const char_t* path_name() const {
+        return path_name_.chars();
+    }
+    
+    virtual bool is_normal_directory() const {
+        if ((this->is_directory()) && (!is_circular())) {
+            return true;
+        }
+        return false;
+    }
+    virtual bool is_circular_directory() const {
+        if ((this->is_directory()) && (is_circular())) {
+            return true;
+        }
+        return false;
+    }
     virtual bool is_circular() const {
         return (is_current_ || is_parent_);
     }
@@ -82,18 +130,6 @@ public:
         return is_parent_;
     }
 
-    virtual const string_t& set_path_name(const char* to) {
-        path_name_.assign(to);
-        return path_name_;
-    }
-    virtual const string_t& set_path_name(const wchar_t* to) {
-        path_name_.assign(to);
-        return path_name_;
-    }
-    virtual const string_t& path_name() const {
-        return path_name_;
-    }
-    
     virtual const char* current_name_chars() const {
         return ".";
     }
@@ -111,6 +147,21 @@ public:
     }
 
 protected:
+    virtual const char_t* append_path_name(const string_t& to) {
+        if ((path_name_.has_chars())) {
+            string_t volume_directory_separator(volume_directory_separator_chars()), 
+                     directory_separator(directory_separator_chars());
+            if ((path_name_.compare(volume_directory_separator)) 
+                && (path_name_.compare(directory_separator))) {
+                path_name_.append(directory_separator);
+            }
+        }
+        path_name_.append(to);
+        return path_name();
+    }
+
+    virtual void on_set_path_name() {
+    }
     virtual void on_set_name() {
         set_is_current(false);
         set_is_parent(false);
@@ -122,6 +173,18 @@ protected:
             } else {
             }
         }
+    }
+
+    void construct(const entryt &copy) {
+        extends::construct(copy), 
+        is_current_=(copy.is_current()), is_parent_=(copy.is_parent());
+        path_name_.assign(copy.path_name());
+    }
+    void construct() {
+        is_current_=(false), is_parent_=(false);
+    }
+    void destruct() {
+        path_name_.clear();
     }
 
 protected:

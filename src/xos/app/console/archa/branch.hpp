@@ -31,8 +31,57 @@ namespace console {
 namespace archa {
 
 class branch;
+typedef fs::directory::entry entry;
+typedef std::tree::leaft<branch, entry> leaf_extends;
+///////////////////////////////////////////////////////////////////////
+///  Class: leaf
+///////////////////////////////////////////////////////////////////////
+class leaf: public leaf_extends {
+public:
+    typedef leaf_extends extends;
+    leaf(const string_t& path, const string_t& name, fs::entry_type type) {
+        construct(path.chars(), name.chars(), type);
+    }
+    leaf(const string_t& path, const fs::directory::entry& entry) {
+        construct(path.chars(), entry);
+    }
+    leaf(const char* path, const char* name, fs::entry_type type) {
+        construct(path, name, type);
+    }
+    leaf(const char* path, const fs::directory::entry& entry) {
+        construct(path, entry);
+    }
+    leaf(const fs::directory::entry& entry) {
+        construct(entry);
+    }
+    leaf(const leaf& copy) {
+        construct(copy);
+    }
+    leaf() {
+        construct();
+    }
+    void construct(const char* path, const char* name, fs::entry_type type) {
+        construct();
+        this->set_path_name(path);
+        this->set_name(name);
+        this->set_type(type);
+    }
+    void construct(const char* path, const fs::directory::entry& entry) {
+        construct(entry);
+        this->set_path_name(path);
+    }
+    void construct(const fs::directory::entry& entry) {
+        extends::construct(entry);
+        construct();
+    }
+    void construct() {
+    }
+    virtual ~leaf() {}
+};
+
+typedef std::tree::leavest<leaf> leaves;
 typedef std::tree::branchest<branch> branches;
-typedef std::tree::brancht<branch, branches, fs::directory::entry> branch_extends;
+typedef std::tree::brancht<branch, branches, leaves, entry> branch_extends;
 ///////////////////////////////////////////////////////////////////////
 ///  Class: branch
 ///////////////////////////////////////////////////////////////////////
@@ -61,8 +110,7 @@ public:
     branch() {
         construct();
     }
-    virtual ~branch() {
-    }
+    virtual ~branch() {}
 
     void construct(const char* path, const char* name, fs::entry_type type) {
         construct();
@@ -82,8 +130,17 @@ public:
         got_branches_=(false);
     }
 
+    virtual archa::leaves& leaves() const {
+        get_branches();
+        return extends::leaves();
+    }
     virtual archa::branches& branches() const {
+        get_branches();
+        return extends::branches();
+    }
+    virtual archa::branches& get_branches() const {
         archa::branches& branches = extends::branches();
+        archa::leaves& leaves = extends::leaves();
         bool& got_branches = this->got_branches();
 
         if (!(got_branches)) {
@@ -91,14 +148,15 @@ public:
             size_t length = 0;
 
             got_branches=(true);
-            if ((fs::entry_type_directory == (this->type())) && (!this->is_circular()) 
-                 && (chars = this->path_name().has_chars(length))) {
+            if ((fs::entry_type_directory == (this->type())) && (!this->is_circular())) {
                 const char_t* directory_separator_chars = 0;
-                string_t name(chars);
+                string_t name(this->path_name());
 
-                if ((directory_separator_chars = this->directory_separator_chars()) 
-                     && (chars[length-1] != directory_separator_chars[0])) {
-                    name.append(directory_separator_chars);
+                if ((chars = name.has_chars(length))) {
+                    if ((directory_separator_chars = this->directory_separator_chars()) 
+                         && (chars[length-1] != directory_separator_chars[0])) {
+                        name.append(directory_separator_chars);
+                    }
                 }
                 if ((chars = this->name(length))) {
                     os::os::fs::directory::path path;
@@ -110,14 +168,25 @@ public:
 
                         if ((entry = path.get_first_entry())) {
                             branch* b = 0;
+                            leaf* l = 0;
                             do {
-                                if (!(entry->is_circular())) {
+                                if ((fs::entry_type_directory == (entry->type())) && (!entry->is_circular())) {
                                     LOG_DEBUG("new branch(name = \"" << name << "\", *entry)...")
                                     if ((b = new branch(name, *entry))) {
                                         branches.push_back(b);
                                     } else {
                                         LOG_ERROR("...failed on new branch(name = \"" << name << "\", *entry)");
                                         break;
+                                    }
+                                } else {
+                                    if (fs::entry_type_directory != (entry->type())) {
+                                        LOG_DEBUG("new leaf(name = \"" << name << "\", *entry)...")
+                                        if ((l = new leaf(name, *entry))) {
+                                            leaves.push_back(l);
+                                        } else {
+                                            LOG_ERROR("...failed on new leaf(name = \"" << name << "\", *entry)");
+                                            break;
+                                        }
                                     }
                                 }
                                 entry = path.get_next_entry();

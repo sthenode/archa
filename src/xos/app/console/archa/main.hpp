@@ -60,8 +60,21 @@ private:
     }
     
 public:
+    virtual leaf* found(leaf* l) {
+        entry* e = l;
+        found(e);
+        return 0;
+    }
     virtual branch* found(branch* b) {
-        typedef branch::char_t char_t;
+        entry* e = b;
+        found(e);
+        for (auto l: b->leaves()) {
+            found(l);
+        }
+        return 0;
+    }
+    virtual entry* found(entry* b) {
+        typedef entry::char_t char_t;
         if (b) {
             size_t length = 0;
             const char_t *chars = b->path_name().has_chars(length),
@@ -124,6 +137,9 @@ protected:
             if (!(err = depth_first_search(b))) {
                 this ->outln();
                 if (!(err = depend_first_search(b))) {
+                    this ->outln();
+                    if (!(err = bottom_first_search(b))) {
+                    }
                 }
             }
         }
@@ -131,17 +147,22 @@ protected:
     }
     virtual int breadth_first_search(branch& b) {
         int err = 0;
-        std::tree::findt<branch, std::tree::breadth_first_searcht<branch, branches>, maint> search(*this, b);
+        std::tree::findt<branch, std::tree::breadth_first_searcht<branch, branches, leaves>, maint> search(*this, b);
         return err;
     }
     virtual int depth_first_search(branch& b) {
         int err = 0;
-        std::tree::findt<branch, std::tree::depth_first_searcht<branch, branches>, maint> search(*this, b);
+        std::tree::findt<branch, std::tree::depth_first_searcht<branch, branches, leaves>, maint> search(*this, b);
         return err;
     }
     virtual int depend_first_search(branch& b) {
         int err = 0;
-        std::tree::findt<branch, std::tree::depend_first_searcht<branch, branches>, maint> search(*this, b);
+        std::tree::findt<branch, std::tree::depend_first_searcht<branch, branches, leaves>, maint> search(*this, b);
+        return err;
+    }
+    virtual int bottom_first_search(branch& b) {
+        int err = 0;
+        std::tree::findt<branch, std::tree::bottom_first_searcht<branch, branches, leaves>, maint> search(*this, b);
         return err;
     }
     virtual int path_stat(fs::path& path) {

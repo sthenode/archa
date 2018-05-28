@@ -82,6 +82,11 @@ public:
     virtual ~entry_typet() {
     }
 
+    virtual entry_typet& clear() {
+        which_ = entry_type_none;
+        return *this;
+    }
+
     virtual entry_typet& operator = (entry_type_which which) {
         which_ = which;
         return *this;
@@ -171,18 +176,8 @@ public:
     entryt() {
         construct();
     }
-    void construct(const entryt& copy) {
-        name_=(copy.name()), is_hidden_=(copy.is_hidden()),
-        size_=(copy.size()), type_=(copy.type()), times_=(copy.times()),
-        time_modified_=(copy.time_modified()), time_accessed_=(copy.time_accessed()),
-        time_changed_=(copy.time_changed()), time_created_=(copy.time_created());
-    }
-    void construct() {
-        is_hidden_=(false), size_=(0), type_=(entry_type_none), times_=(time_when_none),
-        time_modified_=(time_when_modified), time_accessed_=(time_when_accessed),
-        time_changed_=(time_when_changed), time_created_=(time_when_created);
-    }
     virtual ~entryt() {
+        destruct();
     }
 
     virtual entry_type exists(const char* chars) {
@@ -220,17 +215,18 @@ public:
         return times;
     }
 
-    virtual void clear() {
+    virtual entryt& clear() {
         is_hidden_ = false;
         size_ = 0;
-        type_ = entry_type_none;
-        times_ = time_when_none;
+        type_.clear();
+        times_.clear();
         time_modified_.clear();
         time_accessed_.clear();
         time_changed_.clear();
         time_created_.clear();
         path_.clear();
         name_.clear();
+        return *this;
     }
 
     virtual const char_t* set_path(const char_t* chars, size_t length) {
@@ -319,6 +315,12 @@ public:
     virtual const entry_type& type() const {
         return type_;
     }
+    virtual bool is_directory() const {
+        if ((entry_type_directory == (entry_type_directory & (this->type().which())))) {
+            return true;
+        }
+        return false;
+    }
 
     virtual const fs::time_when& set_times(const fs::time_when& times) {
         times_ = times;
@@ -403,6 +405,22 @@ protected:
     virtual void on_set_size() {
     }
     virtual void on_set_type() {
+    }
+
+    void construct(const entryt& copy) {
+        path_=(copy.path()), name_=(copy.name()), is_hidden_=(copy.is_hidden()),
+        size_=(copy.size()), type_=(copy.type()), times_=(copy.times()),
+        time_modified_=(copy.time_modified()), time_accessed_=(copy.time_accessed()),
+        time_changed_=(copy.time_changed()), time_created_=(copy.time_created());
+    }
+    void construct() {
+        is_hidden_=(false), size_=(0), type_=(entry_type_none), times_=(time_when_none),
+        time_modified_=(time_when_modified), time_accessed_=(time_when_accessed),
+        time_changed_=(time_when_changed), time_created_=(time_when_created);
+    }
+    void destruct() {
+        name_.clear();
+        path_.clear();
     }
 
 protected:
