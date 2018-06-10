@@ -21,6 +21,7 @@
 #ifndef _XOS_APP_CONSOLE_ARCHA_BRANCH_HPP
 #define _XOS_APP_CONSOLE_ARCHA_BRANCH_HPP
 
+#include "xos/app/console/archa/leaf.hpp"
 #include "xos/base/std/tree/search.hpp"
 #include "xos/os/fs/directory/entry.hpp"
 #include "xos/os/fs/directory/path.hpp"
@@ -30,58 +31,9 @@ namespace app {
 namespace console {
 namespace archa {
 
-class branch;
-typedef fs::directory::entry entry;
-typedef std::tree::leaft<branch, entry> leaf_extends;
-///////////////////////////////////////////////////////////////////////
-///  Class: leaf
-///////////////////////////////////////////////////////////////////////
-class leaf: public leaf_extends {
-public:
-    typedef leaf_extends extends;
-    leaf(const string_t& path, const string_t& name, fs::entry_type type) {
-        construct(path.chars(), name.chars(), type);
-    }
-    leaf(const string_t& path, const fs::directory::entry& entry) {
-        construct(path.chars(), entry);
-    }
-    leaf(const char* path, const char* name, fs::entry_type type) {
-        construct(path, name, type);
-    }
-    leaf(const char* path, const fs::directory::entry& entry) {
-        construct(path, entry);
-    }
-    leaf(const fs::directory::entry& entry) {
-        construct(entry);
-    }
-    leaf(const leaf& copy) {
-        construct(copy);
-    }
-    leaf() {
-        construct();
-    }
-    void construct(const char* path, const char* name, fs::entry_type type) {
-        construct();
-        this->set_path_name(path);
-        this->set_name(name);
-        this->set_type(type);
-    }
-    void construct(const char* path, const fs::directory::entry& entry) {
-        construct(entry);
-        this->set_path_name(path);
-    }
-    void construct(const fs::directory::entry& entry) {
-        extends::construct(entry);
-        construct();
-    }
-    void construct() {
-    }
-    virtual ~leaf() {}
-};
-
 typedef std::tree::leavest<leaf> leaves;
 typedef std::tree::branchest<branch> branches;
-typedef std::tree::brancht<branch, branches, leaves, entry> branch_extends;
+typedef std::tree::brancht<branch, branches, leaves, node> branch_extends;
 ///////////////////////////////////////////////////////////////////////
 ///  Class: branch
 ///////////////////////////////////////////////////////////////////////
@@ -95,11 +47,17 @@ public:
     branch(const string_t& path, const fs::directory::entry& entry) {
         construct(path.chars(), entry);
     }
+    branch(const string_t& path) {
+        construct(path.chars());
+    }
     branch(const char* path, const char* name, fs::entry_type type) {
         construct(path, name, type);
     }
     branch(const char* path, const fs::directory::entry& entry) {
         construct(path, entry);
+    }
+    branch(const char* path) {
+        construct(path);
     }
     branch(const fs::directory::entry& entry) {
         construct(entry);
@@ -110,24 +68,31 @@ public:
     branch() {
         construct();
     }
-    virtual ~branch() {}
+    virtual ~branch() {
+        destruct();
+    }
 
     void construct(const char* path, const char* name, fs::entry_type type) {
         construct();
-        this->set_path_name(path);
-        this->set_name(name);
-        this->set_type(type);
+        this->set(path, name, type);
     }
     void construct(const char* path, const fs::directory::entry& entry) {
         construct(entry);
-        this->set_path_name(path);
+        this->set(path);
+    }
+    void construct(const char* path) {
+        construct();
+        this->set(path);
+        this->set_is_directory();
     }
     void construct(const fs::directory::entry& entry) {
-        extends::construct(entry);
         construct();
+        this->set(entry);
     }
     void construct() {
         got_branches_=(false);
+    }
+    void destruct() {
     }
 
     virtual archa::leaves& leaves() const {
@@ -138,6 +103,7 @@ public:
         get_branches();
         return extends::branches();
     }
+
     virtual archa::branches& get_branches() const {
         archa::branches& branches = extends::branches();
         archa::leaves& leaves = extends::leaves();
@@ -153,19 +119,19 @@ public:
                 string_t name(this->path_name());
 
                 if ((chars = name.has_chars(length))) {
-                    if ((directory_separator_chars = this->directory_separator_chars()) 
-                         && (chars[length-1] != directory_separator_chars[0])) {
-                        name.append(directory_separator_chars);
-                    }
-                }
-                if ((chars = this->name(length))) {
                     os::os::fs::directory::path path;
 
-                    name.append(chars, length);
+                    if ((chars = this->has_name(length))) {
+                        if ((directory_separator_chars = this->directory_separator_chars()) 
+                             && (chars[length-1] != directory_separator_chars[0])) {
+                            name.append(directory_separator_chars);
+                        }
+                        name.append(chars, length);
+                    }
                     LOG_DEBUG("path.open(name = \"" << name << "\")...");
                     if ((path.open(name))) {
                         os::os::fs::directory::entry* entry = 0;
-
+    
                         if ((entry = path.get_first_entry())) {
                             branch* b = 0;
                             leaf* l = 0;

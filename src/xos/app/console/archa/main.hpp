@@ -77,7 +77,7 @@ public:
         typedef entry::char_t char_t;
         if (b) {
             size_t length = 0;
-            const char_t *chars = b->path_name().has_chars(length),
+            const char_t *chars = b->path_name(),
                          *separator_chars = b->directory_separator_chars(),
                          *name_chars = b->name();
             string_t path(chars);
@@ -97,12 +97,20 @@ public:
 protected:
     virtual int run(int argc, char_t** argv, char_t** env) {
         int err = 0;
-        const char* chars = (optind < argc)?(argv[optind]):(argv[0]);
-        fs::path p(chars);
-        err = path(p);
+        const char* chars = 0;//(optind < argc)?(argv[optind]):(argv[0]);
+        /*fs::path p(chars);
+        err = path(p);*/
+        if ((optind<argc) && (argv)) {
+            chars = argv[optind];
+        }
+        if ((chars) && (chars[0])) {
+            err = path(chars);
+        } else {
+            err = this->usage(argc, argv, env);
+        }
         return err;
     }
-    int (derives::*path_)(fs::path& path);
+    /*int (derives::*path_)(fs::path& path);
     int path(fs::path& path) {
         int err = 0;
         if ((path_)) {
@@ -116,6 +124,25 @@ protected:
         int err = 0;
         if ((path.has_chars())) {
             branch b(path.directory(), path.file_name(), fs::entry_type_directory);
+            search(b);
+        }
+        return err;
+    }
+*/
+    int (derives::*path_)(const char_t* path);
+    int path(const char_t* path) {
+        int err = 0;
+        if ((path_)) {
+            err = (this->*path_)(path);
+        } else {
+            err = path_search(path);
+        }
+        return err;
+    }
+    int path_search(const char_t* path) {
+        int err = 0;
+        if ((path) && (path[0])) {
+            branch b(path);
             search(b);
         }
         return err;
@@ -165,7 +192,7 @@ protected:
         std::tree::findt<branch, std::tree::bottom_first_searcht<branch, branches, leaves>, maint> search(*this, b);
         return err;
     }
-    virtual int path_stat(fs::path& path) {
+    /*virtual int path_stat(fs::path& path) {
         int err = 0;
         os::os::fs::entry entry;
         fs::entry_type type;
@@ -190,6 +217,10 @@ protected:
                 }
             }
         }
+        return err;
+    }*/
+    int path_stat(const char_t* path) {
+        int err = 0;
         return err;
     }
 

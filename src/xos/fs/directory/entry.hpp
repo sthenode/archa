@@ -53,25 +53,22 @@ public:
         destruct();
     }
     
-    virtual const char_t* append_path_name(const char* to, size_t length) {
-        string_t name(to, length);
-        append_path_name(name);
+    template <typename tchar_t>
+    const char_t* set_path_namet(const tchar_t* path, const tchar_t* name) {
+        path_name_.clear();
+        if ((path) && (path[0])) {
+            path_name_.append(path);
+            if ((name) && (name[0])) {
+                path_name_.append(directory_separator_chars());
+            }
+        }
+        if ((name) && (name[0])) {
+            path_name_.append(name);
+        }
         return path_name();
     }
-    virtual const char_t* append_path_name(const char* to) {
-        string_t name(to);
-        append_path_name(name);
-        return path_name();
-    }
-    virtual const char_t* append_path_name(const wchar_t* to, size_t length) {
-        string_t name(to, length);
-        append_path_name(name);
-        return path_name();
-    }
-    virtual const char_t* append_path_name(const wchar_t* to) {
-        string_t name(to);
-        append_path_name(name);
-        return path_name();
+    virtual const char_t* set_path_name(const char* path, const char* name) {
+        return set_path_namet<char>(path, name);
     }
     virtual const char_t* set_path_name(const char* to, size_t length) {
         path_name_.assign(to, length);
@@ -81,6 +78,10 @@ public:
         path_name_.assign(to);
         return path_name();
     }
+
+    virtual const char_t* set_path_name(const wchar_t* path, const wchar_t* name) {
+        return set_path_namet<wchar_t>(path, name);
+    }
     virtual const char_t* set_path_name(const wchar_t* to, size_t length) {
         path_name_.assign(to, length);
         return path_name();
@@ -89,8 +90,15 @@ public:
         path_name_.assign(to);
         return path_name();
     }
+
+    virtual const char_t* has_path_name(size_t& length) const {
+        return path_name_.has_chars(length);
+    }
     virtual const char_t* has_path_name() const {
         return path_name_.has_chars();
+    }
+    virtual const char_t* path_name(size_t& length) const {
+        return path_name_.chars(length);
     }
     virtual const char_t* path_name() const {
         return path_name_.chars();
@@ -146,20 +154,20 @@ public:
         return "/";
     }
 
-protected:
-    virtual const char_t* append_path_name(const string_t& to) {
-        if ((path_name_.has_chars())) {
-            string_t volume_directory_separator(volume_directory_separator_chars()), 
-                     directory_separator(directory_separator_chars());
-            if ((path_name_.compare(volume_directory_separator)) 
-                && (path_name_.compare(directory_separator))) {
-                path_name_.append(directory_separator);
-            }
-        }
-        path_name_.append(to);
-        return path_name();
+    virtual entryt& set(const entryt &copy) {
+        extends::set(copy);
+        is_current_=(copy.is_current()), is_parent_=(copy.is_parent());
+        path_name_.assign(copy.path_name());
+        return *this;
+    }
+    virtual entryt& clear() {
+        extends::clear();
+        is_current_=(false), is_parent_=(false);
+        path_name_.clear();
+        return *this;
     }
 
+protected:
     virtual void on_set_path_name() {
     }
     virtual void on_set_name() {
@@ -175,10 +183,10 @@ protected:
         }
     }
 
+private:
     void construct(const entryt &copy) {
-        extends::construct(copy), 
-        is_current_=(copy.is_current()), is_parent_=(copy.is_parent());
-        path_name_.assign(copy.path_name());
+        construct();
+        this->set(copy);
     }
     void construct() {
         is_current_=(false), is_parent_=(false);
