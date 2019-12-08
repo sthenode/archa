@@ -31,7 +31,7 @@ namespace fs {
 ///////////////////////////////////////////////////////////////////////
 template
 <typename TChar = char, typename TEnd = TChar, TEnd VEnd = 0,
- class TImplement = char_string_implementt<TChar, TEnd, VEnd>,
+ class TImplement = string_implementt<TChar, TEnd, VEnd>,
  class TString = char_stringt<TChar, TEnd, VEnd, TImplement>,
  class TEvents = path_separator_eventst<TString>,
  class TSeparator = path_separatort<TEvents>,
